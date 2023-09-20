@@ -1,0 +1,16 @@
+{% extends 'base.html' %}
+{% load crispy_forms_tags %}
+
+
+{% block title %}
+	<h1 class="display-2 justify-content-center">Account Transactions</h1>
+{% endblock title %}
+
+{% block content %}
+    
+<form action = "" method = "post" enctype="multipart/form-data">
+	{% csrf_token %}
+	{{form|crispy }}
+	<input type="submit" value="Submit">
+</form>
+{% endblock content %}

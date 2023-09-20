@@ -1,0 +1,101 @@
+<div class="modal" id="bill_modal" tabindex="-1" aria-labelledby="billmodallabel" aria-hidden="fasle">
+	<div class="modal-dialog modal-dialog-centered">
+	  <div class="modal-content">
+		<div class="modal-header">
+		  <h5 class="modal-title" id="billmodallabel">Bill</h5>
+		  <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+		</div>
+		<div class="modal-body" style="overflow-y:scroll;">
+			Sale Completed Successfully
+
+			<div id="print-area" style="width:260px;height:120px;font-size:12px;margin-left:22px;font-weight:bolder">
+				<div class="row " style="margin-top:5px;">
+					<div class="col-6">
+						<div style="margin:auto">Estimate</div>
+					</div>
+                    <div class="col-6">
+						Number : {{number}}
+					</div>
+                </div>
+                <div class="row " >
+                   
+						<div class="col-6">
+                            Name : {{account.name}}
+                        </div>
+                        <div class="col-6">
+                           Phone : {{account.phone_number}}
+                        </div>
+					
+				</div>
+
+				<div class=" row " style="border-top:2px solid;border-bottom:2px solid;text-align:center">
+					<div class="col-6" style="padding:0;">
+						Product Name
+					</div>
+					<div class="col-2">
+						Qty
+					</div>
+                    <div class="col-2">
+						PPP
+					</div>
+                    <div class="col-2">
+						Total
+					</div>
+				</div>
+                {%for product in products %}
+                <div class=" row " style="font-size:10px;font-weight:400;text-align:right;">
+					<div class="col-6" style="padding:0;height:32px;overflow:hidden;text-align:left" >
+						{{product.0}}
+					</div>
+					<div class="col-2">
+						{{product.1}}
+					</div>
+                    <div class="col-2">
+						{{product.2}}
+					</div>
+                    <div class="col-2">
+						{{product.3}}
+					</div>
+				</div>
+                {% endfor  %}
+
+                <div class=" row " style="border-top:2px solid;border-bottom:2px solid;text-align:right">
+					<div class="col-6" style="padding:0;text-align:center">
+						Grand Total
+					</div>
+					<div class="col-2">
+						{{qty}}
+					</div>
+                    <div class="col-1" style="padding:0;">
+						
+					</div>
+                    <div class="col-3">
+						{{bill}}
+					</div>
+				</div>
+			</div>
+		</div>
+		<div class="modal-footer">
+		  <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+		 
+		  	<button type="button" id="print_bill" class="btn btn-primary">Print</button>
+		 
+		</div>
+	  </div>
+	</div>
+  </div>
+  
+ 
+    <script type="text/javascript">
+        $(window).on('load', function () {
+            {% if not total_bill == 0  %}
+                 $('#bill_modal').modal('show');
+            {% endif %}
+        });
+	$("#print_bill").click(function(){
+
+		$("#print-area").printThis();
+	  });
+	
+    
+  </script>

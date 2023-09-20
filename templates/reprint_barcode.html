@@ -1,0 +1,32 @@
+{% extends 'base.html' %}
+
+
+{% block title %}
+	<h1 class="display-2 justify-content-center">Reprint Barcode</h1>
+{% endblock title %}
+
+
+{% block content %}
+
+{% include "success_print_modal.html" with message=message product_name=product_name product_saved=product_saved  %}
+
+
+<form action = "" method = "GET" >
+    {% csrf_token %}
+    <div class=" mb-3 row ">
+        <div class = "form-floating col-6">
+			<input type="text" class="form-control" name="barcode" maxlength="11"  id="barcode_id" value="{{barcode}}">
+			<label class="col-sm-4 col-form-label" for="barcode_id">Barcode :</label>
+		</div>
+        <div class = "form-floating col-6">
+            <input  type="submit" value="Get Details">
+		</div>
+    </div>
+</form>
+{% endblock content %}
+
+
+{% block js_block %}
+    <script src="/static/js/printThis.js"></script>
+
+{% endblock js_block %}

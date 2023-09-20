@@ -1,0 +1,203 @@
+{% extends 'base.html' %}
+{% load mathfilters %}
+
+{% block title %}
+	<h1 class="display-2 justify-content-center">Check Stock via Purchase Order</h1>
+{% endblock title %}
+
+{% block content %}
+    
+{% include "success_print_modal.html" with message=message product_name=product_name product_saved=product_saved  %}
+
+<form action = "" method = "get" enctype="multipart/form-data">
+	{% csrf_token %}
+
+	{{form_purchase_order }}
+	<input type="submit" name="load_purchase" value="Submit">
+</form>
+<form class="row gx-5" action = "" method = "post" enctype="multipart/form-data">
+	{% csrf_token %}
+
+	<div class=" mb-3 row ">
+		<div class = "form-floating col-12">
+			
+			<input type="text" class="form-control" list="available-products" name="lot_stock" maxlength="300"  id="id_lot_stock">
+			<input type="hidden" name="online_code" id="online_code_id">
+			<datalist id="available-products">
+				{%for product in products %}
+
+					<option data-value="{{product.online_code.product_id}}" data-uncheck="{{product.id}}" data-qty = "{{product.quantity|sub:product.checked_quantity}}" data-sosp ="{{product.sosp}}" data-cat ="{{product.online_code.category_id.category_name}}" data-brand ="{{product.online_code.brand_id.brand_name}}" data-mrp ="{{product.online_code.mrp}}" data-name="{{product.online_code.product_name}}" value="{{product.online_code.product_name}} - {{product.online_code.product_id}}">
+				{% endfor %}
+			</datalist>
+			<label class="col-sm-4 col-form-label" for="id_lot_stock">Product:</label>
+
+		</div>
+	</div>
+	<div class=" mb-3 row ">
+		<div class = "form-floating col-12">
+			<input type="text" class="form-control" name="name" id="id_name" maxlength="200" >
+			<label class="col-sm-2 col-form-label" for="id_name">Product Name:</label>
+		</div>
+	</div>
+	<div class="row mb-3">
+		<div class="form-floating col-4">
+			<input type="number" class="form-control" name="quantity" id="id_quantity" min="1" step="1" required>
+			<label class="col-sm-4 col-form-label" for="id_quantity">Quantity</label>
+		</div>
+		<div class="form-floating col-4">
+			<input type="text" class="form-control" name="brand" id="id_brand" list="brandname">
+			<datalist id="brandname">
+				{%for brand in brands %}
+					<option value="{{brand.brand_name}}">
+				{% endfor %}
+			</datalist>
+			<label class="col-sm-6 col-form-label" for="id_brand">Brand Name:</label>
+		</div>
+		<div class="form-floating col-4">
+			<input type="text" class="form-control" name="category" id="id_category" list="catname">
+			<datalist id="catname">
+				{%for cat in categories %}
+					<option value="{{cat.category_name}}">
+				{% endfor %}
+			</datalist>
+			<label class="col-sm-6 col-form-label" for="id_category">Category Name:</label>
+		</div>
+	</div>
+
+	<div class="row mb-3">
+		<div class="form-floating col-3">
+			<input type="text" class="form-control" name="model" id="id_model" maxlength="100" >
+			<label class="col-sm-4 col-form-label" for="id_model">Model</label>
+		</div>
+		<div class="form-floating col-3">
+			<input type="text" class="form-control" name="color" id="id_color" maxlength="100" >
+			<label class="col-sm-4 col-form-label" for="id_color">Color</label>
+		</div>
+		<div class="form-floating col-3">
+			<input type="text" class="form-control" name="size" id="id_size" maxlength="100" >
+			<label class="col-sm-4 col-form-label" for="id_size">Size</label>
+		</div>
+		<div class="form-floating col-3">
+			<input type="number" class="form-control" name="rating" id="id_rating" min="0" step="0.1">
+			<label class="col-sm-4 col-form-label" for="id_rating" >Rating</label>
+		</div>
+	</div>
+
+	<div class="row mb-3">
+		<div class="form-floating col-2">
+			<input type="number" class="form-control" name="sosp" id="id_sosp" min="0" step="0.01" readonly >
+			<label class="col-sm-6 col-form-label" for="id_sosp">SOSP</label>
+		</div>
+
+		<div class="form-floating col-2">
+			<input type="number" class="form-control" name="cosp" id="id_cosp" min="0" step="0.01" readonly >
+			<label class="col-sm-6 col-form-label" for="id_cosp">COSP</label>
+		</div>
+
+		<div class="form-floating col-2">
+			<input type="number" class="form-control" name="mrp" id="id_mrp" min="0" step="0.01">
+			<label class="col-sm-4 col-form-label" for="id_mrp">MRP:</label>
+		</div>
+
+		<div class="form-floating col-3">
+			<input type="number" class="form-control" name="mbp" id="id_mbp" min="0" step="0.01" required>
+			<label class="col-sm-2 col-form-label" for="id_mbp">MBP</label>
+		</div>
+
+		<div class="form-floating col-3">
+			<select class="form-select" name="qc_status" id="id_qc_status" style="padding-left:15px" required>
+                <option value="">----Select QC Status----</opiton>
+				{%for qc_status in qc_status_list %}
+					<option value="{{qc_status.id}}">{{qc_status.qc_status}}</option>
+				{% endfor %}
+			</select>
+			<label class="col-sm-6 col-form-label" for="id_qc_status">Qc Status:</label>
+		</div>
+	</div>
+    <input class="visually-hidden" name="unchecked_id" type="hidden" id="id_unchecked_id" >
+	<input class="visually-hidden" name="metadata" type="hidden" id="id_metadata" >
+	<div class=" mb-3 row ">
+		<div class = "col-12">
+			<input type="submit" value="Add Product">
+		</div>
+	</div>
+</form>
+
+
+{% endblock content %}
+
+
+{% block js_block %}
+
+<script>
+	$("#id_lot_stock").change(function () {
+	  var sel_product = document.getElementById("id_lot_stock").value;
+	  var online_code = document.querySelector("#available-products option[value='"+sel_product+"']").dataset.value;
+	  $('#online_code_id').val(online_code);
+	  var unchecked_id = document.querySelector("#available-products option[value='"+sel_product+"']").dataset.uncheck;
+	  var quantity = document.querySelector("#available-products option[value='"+sel_product+"']").dataset.qty;
+	  var prod_name = document.querySelector("#available-products option[value='"+sel_product+"']").dataset.name;
+	  var prod_brand = document.querySelector("#available-products option[value='"+sel_product+"']").dataset.brand;
+	  var prod_cat = document.querySelector("#available-products option[value='"+sel_product+"']").dataset.cat;
+	  var prod_sosp = document.querySelector("#available-products option[value='"+sel_product+"']").dataset.sosp;
+	  var prod_mrp = document.querySelector("#available-products option[value='"+sel_product+"']").dataset.mrp;
+	
+	  $("#id_quantity").attr({"max":quantity});
+	  $("#id_unchecked_id").val(unchecked_id);
+	
+	  
+	  var link = "/product/add-checked-stock/"
+	  var purl = link.concat(online_code);
+	  var settings = {
+		  "url": purl,
+		  "method": "GET",
+		  "timeout": 0,
+		};
+		
+	
+		$.ajax(settings).done(function (response) {
+			  console.log(response)
+			  if(response){
+					if(response['name'] == "" || response['name'] ==null)
+					{$("#id_name").val(prod_name);}
+					else{$("#id_name").val(response['name']);}
+
+					if(prod_brand == "")
+					{
+						$("#id_brand").val(response['brand']);
+					}else{
+						$("#id_brand").val(prod_brand);
+					}
+
+					if(prod_cat == "")
+					{
+						$("#id_category").val(response['cateogry']);
+					}else{
+						$("#id_category").val(prod_cat);
+					}
+					
+					
+					$("#id_mrp").val(response['mrp']);
+					$("#id_model").val(response['model']);
+					$("#id_color").val(response['color']);
+					$("#id_rating").val(response['rating']);
+					$("#id_size").val(response['size']);
+					$("#id_cosp").val(response['current_price']);
+					$("#id_sosp").val(prod_sosp);
+					$("#id_metadata").val(JSON.stringify(response['metadata']));
+			  }else{
+				$("#id_sosp").val(prod_sosp);
+				$("#id_mrp").val(prod_mrp);
+				$("#id_category").val(prod_cat);
+				$("#id_brand").val(prod_brand);
+				$("#id_name").val(prod_name);
+
+			  }
+		});
+		
+	});
+  </script>
+  
+<script src="/static/js/printThis.js"></script>
+
+{% endblock js_block %}

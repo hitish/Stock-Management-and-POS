@@ -1,0 +1,109 @@
+{% extends 'base.html' %}
+
+
+{% block title %}
+	<h1 class="display-2 justify-content-center">Check Bill Details</h1>
+{% endblock title %}
+
+{% block content %}
+<form action = "" method = "GET" >
+    {% csrf_token %}
+    <div class=" mb-3 row ">
+        <div class = "form-floating col-6">
+			<input type="number" class="form-control" name="sales_id" maxlength="10"  id="id_sales_id" value="{{sales_id}}">
+			<label class="col-sm-4 col-form-label" for="id_sales_id">Sales ID :</label>
+		</div>
+        <div class = "form-floating col-6">
+            <input  type="submit" value="Get Details">
+		</div>
+    </div>
+</form>
+<div>
+    <div class=' mb-3 row' >
+        <div class ='col-6' style="display:flex">
+            <div class ='col-4'>
+                Name :
+            </div>
+            <div class ='col-8'>
+                {{ account.name}}
+            </div>
+        </div>
+        <div class ='col-6' style="display:flex">
+            <div class ='col-4'>
+                Phone No. :
+            </div>
+            <div class ='col-8'>
+                {{ account.phone_number}}
+            </div>
+        </div>
+
+        <div class ='col-4' style="display:flex">
+            <div class ='col-4'>
+                No. :
+            </div>
+            <div class ='col-8'>
+                {{ sales_id }}
+            </div>
+        </div>
+        <div class ='col-8' style="display:flex">
+            <div class ='col-3'>
+                Date :
+            </div>
+            <div class ='col-7'>
+                {{ date}}
+            </div>
+        </div>
+    </div>
+    <div class=' mb-3 row' style="border-top:2px solid">
+        <div class ='col-5'>
+            Product Name
+        </div>
+        <div class = 'col-2'>
+            Quantity
+        </div>
+        <div class = 'col-2'>
+            Price Per Piece
+        </div>
+        <div class = 'col-2'>
+            Total
+        </div>
+    </div>
+    <div class=' mb-3 row' style="border-top:2px solid">
+        <div class ='col-12'>
+
+        </div>
+    </div>
+    {%for product in products %}
+    <div class=' mb-3 row' >
+        <div class ='col-5'>
+            {{product.0}}
+        </div>
+        <div class = 'col-2'>
+            {{product.1}}
+        </div>
+        <div class = 'col-2'>
+            {{product.2}}
+        </div>
+        <div class = 'col-2'>
+            {{product.3}}
+        </div>
+        
+    </div>
+    {% endfor %}
+
+    <div class=' mb-3 row' style="border-bottom:2px solid;border-top:2px solid">
+        <div class ='col-5'>
+            Grand Total
+        </div>
+        <div class = 'col-2'>
+            {{item_total}}
+        </div>
+        <div class = 'col-2'>
+            
+        </div>
+        <div class = 'col-2'>
+            {{grand_total}}
+        </div>
+    </div>
+</div>
+{% endblock content %}

@@ -1,0 +1,270 @@
+{% extends 'base.html' %}
+{% load crispy_forms_tags %}
+{% load mathfilters %}
+
+{% block title %}
+	<h1 class="display-2 justify-content-center">Sales</h1>
+{% endblock title %}
+
+{% block content %}
+{% if not total_bill == 0  %}
+{% include "bill_print.html" with account=account products=products number=number bill=total_bill qty=total_qty %}
+{%endif%}
+<form action = "" method = "post" enctype="multipart/form-data">
+	{% csrf_token %}
+	
+	<div class=" mb-3 row ">
+		<div class = "form-floating col-6">
+			<input type="text" class="form-control" list="active_accounts" name="account_name" maxlength="300"  id="id_account">
+			<input type="hidden"  name="account_id" maxlength="300"  id="id_account_id">
+			<datalist id="active_accounts">
+				{%for account in accounts %}
+					<option data-value="{{account.id}}" data-phone="{{account.phone_number}}" value="{{account.name}} - {{account.phone_number}}">
+				{% endfor %}
+			</datalist>
+			<label class="col-sm-4 col-form-label" for="id_account">Account Name:</label>
+		</div>
+		<div class = "form-floating col-6">
+			<input type="number" class="form-control" name="phone" maxlength="10"  id="id_phone" max-value=9999999999 min-value=1000000000>
+			<label class="col-sm-4 col-form-label" for="id_phone">Phone :</label>
+		</div>
+	</div>
+	<div class=" mb-3 row ">
+		<div class = "form-floating col-12">
+			<input type="text" class="form-control" name="address" maxlength="300"  id="id_address">
+			<label class="col-sm-4 col-form-label" for="id_address">Address :</label>
+		</div>
+	</div>
+
+	<div class=' mb-3 row' >
+		<div class ='col-6'>Product Name : </div>
+		<div class = 'col-2'>Quantity</div>
+		<div class = 'col-2'>Price</div>
+		<div class = 'col-2'>Total</div>
+	</div>
+
+
+	<input type='hidden' name="product_count" id="product_count">
+	<div id="product-sold">
+	</div>
+	<div class=' mb-3 row' >
+		<div class ='col-6'>Grand Total : </div>
+		<div class = 'col-2' id='total_qty'></div>
+		<div class = 'col-2'></div>
+		<div class = 'col-2' id='total_bill'></div>
+	</div>
+	<div class=" mb-3 row ">
+		<div class = "form-floating col-6">
+			<input type="text" class="form-control" list="available-products" name="checked_stock" maxlength="300"  id="id_checked_stock">
+			<datalist id="available-products">
+				{%for product in checked_stock %}
+					<option data-value="{{product.id}}" data-maxqty = "{{product.quantity|sub:product.sold_quantity}}" data-sellprice ="{{product.mbp}}" value="{{product.product_id.product_name}} - {{product.barcode}}">
+				{% endfor %}
+			</datalist>
+			<label class="col-sm-4 col-form-label" for="id_checked_stock">Product:</label>
+		</div>
+		<div class = "form-floating col-2">
+			<input type="number" class="form-control" name="quantity" maxlength="10"  id="id_quantity">
+			<label class="col-sm-2 col-form-label" for="id_quantity">Qty:</label>
+		</div>
+		<div class = "form-floating col-2">
+			<input type="number" class="form-control" name="priceperpiece" maxlength="100"  id="id_priceperpiece">
+			<label class="col-sm-2 col-form-label" for="id_priceperpiece">Price:</label>
+		</div>
+		<!--div class = "form-floating col-2">
+			<input type="number" class="form-control" name="pricetotal" maxlength="100"  id="id_pricetotal">
+			<label class="col-sm-2 col-form-label" for="id_pricetotal">Total:</label>
+		</div-->
+	</div>
+	<div id="add-product" class=" mb-3 row ">
+		<div class = "form-floating col-12" >
+			<div class="col-3" style="margin:auto">
+				ADD MORE
+			</div>
+		</div>
+	</div>
+	<div class=" mb-3 row ">
+		<div class = "form-floating col-6" >
+			
+			<select class="form-select" name="payment-option" id="payment-option">
+				<option value="-1">----- Select Payment Method -----</option>
+				{%for pay_account in pay_accounts %}
+					<option value="{{pay_account.id}}">{{pay_account.name}}</option>
+				{% endfor %}
+				<option value="-2">Pending</option>
+
+			</select>
+			<label class=" col-form-label" for="payment-option">Payment Options:</label>
+		</div>
+		<div class = "form-floating col-4" >
+			<input type="number" class="form-control" name="amount_paid"  id="id_amount_paid">
+			<label class="col-sm-6 col-form-label" for="id_amount_paid">Amount Paid :</label>
+		</div>
+		<div class = "form-floating col-12" >
+			<input type="text" class="form-control" name="reference-detail" maxlength="300"  id="id_reference">
+			<label class="col-sm-4 col-form-label" for="id_reference">Reference detail:</label>
+		</div>
+	</div>
+
+
+	<input  type="submit" value="Submit">
+</form>
+{% endblock content %}
+
+{% block js_block %}
+
+<script>
+	var sale_product = [];
+	var product_count = 0;
+	var total_qty = 0;
+	var total_bill = 0;
+	window.onload = () => {
+		$("#id_quantity").val(0);
+		$("#id_priceperpiece").val(0);
+	}
+
+	$("form").submit(function(event) {
+		var validate = true;
+		var error = "";
+
+		if(!$("#id_account").val() ){
+			validate = false;
+			error += " Account Name,";
+		}
+		
+		if(!$("#id_phone").val() ){
+			validate = false;
+			error += " Phone Number,";
+		}
+		//alert("product_count" + product_count)
+		if(product_count == 0){
+			validate = false;
+			error += " Add products,";
+		}
+		//alert("payment option" + $("#payment-option").val())
+		if( !$("#payment-option").val() || $("#payment-option").val() == "-1"){
+			validate = false;
+			error += " Payment option,";
+		}
+
+		//alert(validate);
+		if (validate==false) { 
+			alert("Please fill following fields" + error)
+		  	event.preventDefault(); 
+		}
+		else{
+			alert("all good");
+		}
+	});
+
+	$("#payment-option").change(function(){
+		var pay_option = $("#payment-option").val()
+		$("#id_amount_paid").val(total_bill)
+		if(pay_option == "-2")
+		{
+			$("#id_reference").prop('required',true);
+			$("#id_amount_paid").val(0);
+			$("#id_amount_paid").prop('disabled',true);
+		}
+		else{
+			$("#id_reference").prop('required',false);
+			$("#id_amount_paid").prop('disabled',false);
+		}
+
+	});
+
+	$("#id_account").change(function(){
+		var account_name = document.getElementById("id_account").value;
+		var account_id = document.querySelector("#active_accounts option[value='"+account_name+"']").dataset.value;
+		var account_phone = document.querySelector("#active_accounts option[value='"+account_name+"']").dataset.phone;
+		$("#id_account_id").val(account_id);
+		$('#id_phone').val(account_phone);
+		
+		$("#id_account").prop('disabled',true);
+		$('#id_phone').prop('disabled',true);
+
+	});	
+
+	$("#id_checked_stock").change(function(){
+		var sel_product = document.getElementById("id_checked_stock").value;
+		var mbp = document.querySelector("#available-products option[value='"+sel_product+"']").dataset.sellprice;
+		var maxqty = document.querySelector("#available-products option[value='"+sel_product+"']").dataset.maxqty;
+		$("#id_priceperpiece").val(mbp);
+		$("#id_quantity").attr({"max" : maxqty});
+	});
+
+	$("#add-product").click(function () {
+		var checked_stock_id = $("#id_checked_stock").val();
+		var qty = $("#id_quantity").val();
+		qty = parseInt(qty);
+		var priceperpiece = $("#id_priceperpiece").val();
+		var sel_product = document.getElementById("id_checked_stock").value;
+		var product__id = 0;
+		
+		product__id = document.querySelector("#available-products option[value='"+sel_product+"']").dataset.value;
+		max_qty = document.querySelector("#available-products option[value='"+sel_product+"']").dataset.maxqty;
+		max_qty = parseInt(max_qty);
+		if(!(qty==0 || priceperpiece == null || priceperpiece == 0 || qty == null || product__id == 0) )
+		{
+			if(qty <= max_qty)
+			{
+				var total = qty * priceperpiece;
+				sale_product.push([checked_stock_id,product__id,qty,priceperpiece,total]);
+				product_count = product_count + 1;
+				$("#product_count").val(product_count);
+				
+				sale_product_create(sale_product);
+				var qty = 0;
+				$("#id_quantity").val(0);
+				var priceperpiece = 0;
+				$("#id_priceperpiece").val(0);
+				$("#id_checked_stock").val("");
+			}
+			else{
+				alert("Quantity cannot be more than "+ max_qty)
+			}
+		}
+		else{
+			alert("product entry not correct");
+		}
+		
+				
+	});
+
+	$(document).on('click', '.delete', function(){
+		var item_num = this.dataset.value;
+		var item_qty = this.dataset.qty;
+		var item_total = this.dataset.total;
+
+		sale_product.splice(item_num,1)
+		sale_product_create(sale_product);
+
+	});
+
+	function sale_product_create(sale_product){
+		inner_html = "";
+		total_qty = 0;
+		total_bill = 0;
+		product_count = 0;
+
+		for (let i = 0; i<sale_product.length; i++) {
+			inner_html += "<div class=' mb-3 row' ><div class ='col-5'><input type='text' class='form-control' value='" + sale_product[i][0] + "' disabled><input type='hidden' value='" + sale_product[i][1] + "' name='selected_product"+[i] +"'></div><div class = 'col-2'><input type='number' class='form-control' value='" + sale_product[i][2] + "' name='qty"+[i]+ "' readonly></div><div class = 'col-2'><input type='number' class='form-control' value='" + sale_product[i][3] + "' name='priceperpiece"+[i]+ "' readonly></div><div class = 'col-2'><input type='number' value='" + sale_product[i][2]*sale_product[i][3] + "' readonly></div><div class = 'col-1'><button data-value='"+i+"' class='delete'>Del</button></div></div>";
+
+			total_qty += parseInt(sale_product[i][2]);
+			total_bill += parseInt(sale_product[i][3]) * parseInt(sale_product[i][2]);
+			product_count += 1;
+
+		  }
+
+		$("#product-sold").html(inner_html);
+		$("#total_qty").html(total_qty);
+		$("#total_bill").html(total_bill);
+		$("#product_count").val(product_count);
+
+	}
+
+</script>
+
+<script src="/static/js/printThis.js"></script>
+
+{%endblock js_block %}

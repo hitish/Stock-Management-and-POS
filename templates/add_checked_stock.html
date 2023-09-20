@@ -1,0 +1,143 @@
+{% extends 'base.html' %}
+
+{% block title %}
+	<h1 class="display-2 justify-content-center">Add Checked Stock</h1>
+{% endblock title %}
+
+
+
+{% block content %}
+
+{% include "success_print_modal.html" with message=message product_name=product_name product_saved=product_saved  %}
+
+<form class="row gx-5" action = "" method = "post" enctype="multipart/form-data">
+	{% csrf_token %}
+
+	<div class=" mb-3 row ">
+		<div class = "form-floating col-12">
+			<input type="text" class="form-control" name="online_code" maxlength="100"  id="id_online_code">
+			<label class="col-sm-2 col-form-label" for="id_product_id">Product id:</label>
+		</div>
+	</div>
+	<div class=" mb-3 row ">
+		<div class = "form-floating col-12">
+			<input type="text" class="form-control" name="name" id="id_name" maxlength="200" >
+			<label class="col-sm-2 col-form-label" for="id_name">Product Name:</label>
+		</div>
+	</div>
+	<div class="row mb-3">
+		<div class="form-floating col-4">
+			<input type="number" class="form-control" name="quantity" id="id_quantity" min="0" step="1" required>
+			<label class="col-sm-4 col-form-label" for="id_quantity">Quantity</label>
+		</div>
+		<div class="form-floating col-4">
+			<input type="text" class="form-control" name="brand" id="id_brand" list="brandname">
+			<datalist id="brandname">
+				{%for brand in brands %}
+					<option value="{{brand.brand_name}}">
+				{% endfor %}
+			</datalist>
+			<label class="col-sm-6 col-form-label" for="id_brand">Brand Name:</label>
+		</div>
+		<div class="form-floating col-4">
+			<input type="text" class="form-control" name="category" id="id_category" list="catname">
+			<datalist id="catname">
+				{%for cat in categories %}
+					<option value="{{cat.category_name}}">
+				{% endfor %}
+			</datalist>
+			<label class="col-sm-6 col-form-label" for="id_category">Category Name:</label>
+		</div>
+	</div>
+
+	<div class="row mb-3">
+		<div class="form-floating col-3">
+			<input type="text" class="form-control" name="model" id="id_model" maxlength="100" >
+			<label class="col-sm-4 col-form-label" for="id_model">Model</label>
+		</div>
+		<div class="form-floating col-3">
+			<input type="text" class="form-control" name="color" id="id_color" maxlength="100" >
+			<label class="col-sm-4 col-form-label" for="id_color">Color</label>
+		</div>
+		<div class="form-floating col-3">
+			<input type="text" class="form-control" name="size" id="id_size" maxlength="100" >
+			<label class="col-sm-4 col-form-label" for="id_size">Size</label>
+		</div>
+		<div class="form-floating col-3">
+			<input type="number" class="form-control" name="rating" id="id_rating" min="0" step="0.1">
+			<label class="col-sm-4 col-form-label" for="id_rating" >Rating</label>
+		</div>
+	</div>
+
+	<div class="row mb-3">
+		<div class="form-floating col-3">
+			<input type="number" class="form-control" name="cosp" id="id_cosp" min="0" step="0.01" readonly >
+			<label class="col-sm-6 col-form-label" for="id_cosp">Current OSP</label>
+		</div>
+
+		<div class="form-floating col-3">
+			<input type="number" class="form-control" name="mrp" id="id_mrp" min="0" step="0.01">
+			<label class="col-sm-4 col-form-label" for="id_mrp">MRP:</label>
+		</div>
+
+		<div class="form-floating col-3">
+			<input type="number" class="form-control" name="mbp" id="id_mbp" min="0" step="0.01" required>
+			<label class="col-sm-2 col-form-label" for="id_mbp">MBP</label>
+		</div>
+
+		<div class="form-floating col-3">
+			<select class="form-select" name="qc_status" id="id_qc_status" style="padding-left:45px" >
+				{%for qc_status in qc_status_list %}
+					<option value="{{qc_status.id}}">{{qc_status.qc_status}}</option>
+				{% endfor %}
+			</select>
+			<label class="col-sm-6 col-form-label" for="id_qc_status">Qc Status:</label>
+		</div>
+	</div>
+	<input class="visually-hidden" name="metadata" type="hidden" id="id_metadata" >
+	<div class=" mb-3 row ">
+		<div class = "col-12">
+			<input type="submit" value="Add Product">
+		</div>
+	</div>
+</form>
+
+
+
+{% endblock content %}
+
+
+{% block js_block %}
+
+<script>
+	$("#id_online_code").change(function () {
+	  
+	  var online_code = $(this).val();  // get the selected country ID from the HTML input
+	  var link = "/product/add-checked-stock/"
+	  var purl = link.concat(online_code)
+	  var settings = {
+		  "url": purl,
+		  "method": "GET",
+		  "timeout": 0,
+		};
+	  
+		$.ajax(settings).done(function (response) {
+			  console.log(response)
+			  $("#id_name").val(response['name']);
+			  $("#id_brand").val(response['brand']);
+			  $("#id_category").val(response['category']);
+			  $("#id_model").val(response['model']);
+			  $("#id_color").val(response['color']);
+			  $("#id_rating").val(response['rating']);
+			  $("#id_size").val(response['size']);
+			  $("#id_cosp").val(response['current_price']);
+			  $("#id_mrp").val(response['original_price']);
+			  $("#id_metadata").val(JSON.stringify(response['metadata']));
+		});
+	});
+  </script>
+
+  
+<script src="/static/js/printThis.js"></script>
+
+{% endblock js_block %}

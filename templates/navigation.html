@@ -1,0 +1,51 @@
+<aside class="bd-sidebar">
+  <nav class=" bd-links" id="bd-docs-nav" aria-label="WHM navigation">
+      <ul class="list-unstyled mb-0 py-3 pt-md-1">
+      <li class="mb-1">
+        <button class="btn d-inline-flex align-items-center rounded collapsed" data-bs-toggle="collapse" data-bs-target="#product-menu" aria-expanded="false">
+          Products
+        </button>
+  
+        <div class="collapse" id="product-menu">
+          <ul class="list-unstyled fw-normal pb-1 small">
+              <li><a href="{% url 'add-purchase-order'  %}" class="d-inline-flex align-items-center rounded">Add Purchase Order</a></li>
+              <li><a href="{% url 'add-checked-stock'  %}" class="d-inline-flex align-items-center rounded">Add Checked Stock</a></li>
+              <li><a href="{% url 'po-stock-checking'  %}" class="d-inline-flex align-items-center rounded">Check Products</a></li>
+              <li><a href="{% url 'stock-display'  %}" class="d-inline-flex align-items-center rounded">Stock Display</a></li>
+              <li><a href="{% url 'reprint-barcode'  %}" class="d-inline-flex align-items-center rounded">Reprint Barcode</a></li>
+              
+          </ul>
+        </div>
+      </li>
+      <li class="mb-1">
+          <button class="btn d-inline-flex align-items-center rounded collapsed" data-bs-toggle="collapse" data-bs-target="#accounting-menu" aria-expanded="false">
+            Accounting
+          </button>
+    
+          <div class="collapse" id="accounting-menu">
+            <ul class="list-unstyled fw-normal pb-1 small">
+                <li><a href="{% url 'account-transaction'  %}" class="d-inline-flex align-items-center rounded">Account Transaction</a></li>
+                <li><a href="{% url 'account-display'  %}" class="d-inline-flex align-items-center rounded">Account Display</a></li>
+                <li><a href="{% url 'account-list'  %}" class="d-inline-flex align-items-center rounded">Account List</a></li>
+              
+                
+            </ul>
+          </div>
+        </li>
+        <li class="mb-1">
+          <button class="btn d-inline-flex align-items-center rounded collapsed" data-bs-toggle="collapse" data-bs-target="#sales-menu" aria-expanded="false">
+            Sales
+          </button>
+    
+          <div class="collapse" id="sales-menu">
+            <ul class="list-unstyled fw-normal pb-1 small">
+                <li><a href="{% url 'store-sale'  %}" class="d-inline-flex align-items-center rounded">Product Sale</a></li>
+                <li><a href="{% url 'sale-return'  %}" class="d-inline-flex align-items-center rounded">Sale Return</a></li>
+                <li><a href="{% url 'check-bill-details'  %}" class="d-inline-flex align-items-center rounded">Check Bill Details</a></li>
+                <li><a href="{% url 'sales-report'  %}" class="d-inline-flex align-items-center rounded">Sales Report</a></li>
+            </ul>
+          </div>
+        </li>
+  </ul>
+  </nav>
+  </aside>

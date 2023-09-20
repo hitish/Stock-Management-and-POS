@@ -1,0 +1,107 @@
+{% extends 'base.html' %}
+
+
+{% block title %}
+	<h1 class="display-2 justify-content-center">Product Return</h1>
+{% endblock title %}
+
+{% block content %}
+{% include "success_print_modal.html" with message=message product_name=product_name product_saved=product_saved  %}
+<form action = "" method = "GET" >
+    {% csrf_token %}
+    <div class=" mb-3 row ">
+        <div class = "form-floating col-6">
+			<input type="number" class="form-control" name="sales_id" maxlength="10"  id="id_sales_id" value="{{sales_id}}">
+			<label class="col-sm-4 col-form-label" for="id_sales_id">Sales ID :</label>
+		</div>
+        <div class = "form-floating col-6">
+            <input  type="submit" value="Get Details">
+		</div>
+    </div>
+</form>
+    <form action = "" method = "POST" >
+        {% csrf_token %}
+        <input type = "hidden" name= "sales_id" value = "{{sales_id}}">
+    <div class=" mb-3 row ">
+		<div class = "form-floating col-6" >
+			
+			<select class="form-control" name="return-product" id="return-product_id">
+				<option value="-1">----- Select Product to be returned -----</option>
+				{%for product in products %}
+					<option data-qty="{{product.1}}" data-ppp="{{product.2}}" value="{{product.0.product_id}}">{{product.0.product_name}}</option>
+				{% endfor %}
+				
+			</select>
+            <label class="col-sm-4 col-form-label" for="return-product_id">Select Product:</label>
+		</div>
+        <div class = "form-floating col-3" >
+			<input type="number" class="form-control" name="return_qty" maxlength="10"  id="id_return_qty" >
+            <label class="col-sm-8 col-form-label" for="id_return_qty">Return Quantity:</label>
+		</div>
+        <div class = "form-floating col-3" >
+			<input type="number" class="form-control" name="ppp" maxlength="10"  id="id_ppp" readonly >
+            <label class="col-sm-8 col-form-label" for="id_ppp">Price per piece:</label>
+		</div>
+    </div>
+    <div class=" mb-3 row ">
+        <div class = "form-floating col-6" >
+            <select class="form-select" name="qc_status" id="id_qc_status"  >
+                    {%for qc_status in qc_status_list %}
+                        <option value="{{qc_status.id}}">{{qc_status.qc_status}}</option>
+                    {% endfor %}
+            </select>
+             <label class="col-sm-8 col-form-label" for="id_qc_status">Product Condition:</label>
+		</div>
+        <div class = "form-floating col-6" >
+            <input type="number" class="form-control" name="amount_new_mbp" id="id_amount_new_mbp" required>
+            <label class="col-sm-8 col-form-label" for="id_amount_new_mbp">New MBP :</label>
+        </div>
+    </div>
+    <div class=" mb-3 row ">  
+        <div class = "form-floating col-6" >
+            <select class="form-select" name="payment-option" id="payment-option">
+				<option value="-1">----- Select Payment Method -----</option>
+				{%for pay_account in pay_accounts %}
+					<option value="{{pay_account.id}}">{{pay_account.name}}</option>
+				{% endfor %}
+				<option value="-2">Pending</option>
+			</select>
+             <label class="col-sm-8 col-form-label" for="payment-option">Payment returned Through:</label>
+		</div>
+        <div class = "form-floating col-6" >
+            <input type="number" class="form-control" name="amount_refunded" id="id_amt_refunded" required>
+            <label class="col-sm-8 col-form-label" for="id_amt_refunded">Amound Refunded:</label>
+        </div>
+    </div>
+
+    <div class=" mb-3 row ">
+		<div class = "form-floating col-12" >
+            <input type="text-area" class="form-control" name="return_desc" id="id_return_desc" maxlength = "300" required>
+            <label class="col-sm-8 col-form-label" for="id_return_desc">Return Reason:</label>
+        </div>
+    </div>
+   
+    <div class = "form-floating col-6">
+        <input  type="submit" value="Submit">
+    </div>
+
+</form>
+{% endblock content %}
+
+{% block js_block %}
+
+    <script>
+        $("#return-product_id").change(function(){
+            var selected = $(this).find('option:selected');
+            var maxqty = selected.data('qty'); 
+            var ppp = selected.data('ppp'); 
+            
+            $("#id_return_qty").attr({"max" : maxqty});
+            $("#id_return_qty").val(maxqty);
+            $("#id_ppp").val(ppp);
+
+        });
+    </script>
+    <script src="/static/js/printThis.js"></script>
+
+{% endblock js_block %}

@@ -1,0 +1,24 @@
+   
+   #success-modal {
+        display: true;
+        width:250px;
+        position:absolute;
+        top:100px;
+        left:100px;
+
+    }   
+
+    .left-sidebar{
+        background-color:beige;
+
+    }
+
+    .title{
+
+        background-color:bisque;
+    }
+
+    .content{
+        background-color: azure;
+        padding:10px 5px;
+    }
